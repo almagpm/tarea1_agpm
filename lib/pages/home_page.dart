@@ -5,42 +5,21 @@ import 'package:video1_agpm/widgets/custom_app_bar.dart';
 import 'package:video1_agpm/widgets/custom_bottom_bar.dart';
 
 class HomePageCha extends StatefulWidget {
-  const HomePageCha({Key ? key}) : super(key: key);
+  const HomePageCha({Key? key}) : super(key: key);
 
   @override
   State<HomePageCha> createState() => _HomePageChaState();
 }
 
 class _HomePageChaState extends State<HomePageCha> {
- final _pageController = PageController(viewportFraction: 0.75);
+  final _pageController = PageController(viewportFraction: 0.75);
 
   double _currentPage = 0.0;
-  double indexPage = 0.0;
 
   void _listener() {
     setState(() {
       _currentPage = _pageController.page!;
-      if (_currentPage >= 0 && _currentPage < 0.7) {
-        indexPage = 0;
-      } else if (_currentPage > 0.7 && _currentPage < 1.7) {
-        indexPage = 1;
-      } else if (_currentPage > 1.7 && _currentPage < 2.7) {
-        indexPage = 2;
-      }
     });
-  }
-
-  Color getColor() {
-    late final Color color;
-    if (_currentPage >= 0 && _currentPage < 0.7) {
-      color = listCha[0].listImage[0].color;
-    } else if (_currentPage > 0.7 && _currentPage < 1.7) {
-      color = listCha[1].listImage[0].color;
-    } else if (_currentPage > 1.7 && _currentPage < 2.7) {
-      color = listCha[2].listImage[0].color;
-    }
-
-    return color;
   }
 
   @override
@@ -77,7 +56,7 @@ class _HomePageChaState extends State<HomePageCha> {
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 20,
-                          color: index == 0 ? getColor() : Colors.white,
+                          color: index == _currentPage.round() ? getColor(index) : Colors.grey,
                         ),
                       ),
                     ),
@@ -92,7 +71,6 @@ class _HomePageChaState extends State<HomePageCha> {
                 controller: _pageController,
                 itemBuilder: (context, index) {
                   final cha = listCha[index];
-                  final listTitle = cha.clan.split(' ');
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
@@ -104,20 +82,20 @@ class _HomePageChaState extends State<HomePageCha> {
                       );
                     },
                     child: Padding(
-                      padding:
-                          EdgeInsets.only(right: index == indexPage ? 30 : 60),
+                      padding: EdgeInsets.only(right: _currentPage.round() == index ? 30 : 60),
                       child: Transform.translate(
-                        offset: Offset(index == indexPage ? 0 : 20, 0),
+                        offset: Offset(_currentPage.round() == index ? 0 : 20, 0),
                         child: LayoutBuilder(builder: (context, constraints) {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             margin: EdgeInsets.only(
-                              top: index == indexPage ? 30 : 50,
+                              top: _currentPage.round() == index ? 30 : 50,
                               bottom: 30,
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(36),
                               color: Colors.white,
+
                             ),
                             child: Stack(
                               clipBehavior: Clip.none,
@@ -128,8 +106,7 @@ class _HomePageChaState extends State<HomePageCha> {
                                     vertical: 40,
                                   ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
                                         cha.clan,
@@ -158,15 +135,6 @@ class _HomePageChaState extends State<HomePageCha> {
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      FittedBox(
-                                        child: Text(
-                                          '${listTitle[0]} \n${listTitle[1]}',
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -195,7 +163,9 @@ class _HomePageChaState extends State<HomePageCha> {
                                     ),
                                     clipBehavior: Clip.antiAliasWithSaveLayer,
                                     child: InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        _showProfessorsDialog(cha.professors, getColor(index) );
+                                      },
                                       child: const SizedBox(
                                         height: 100,
                                         width: 100,
@@ -220,11 +190,54 @@ class _HomePageChaState extends State<HomePageCha> {
             Container(
               height: 120,
               padding: const EdgeInsets.all(20),
-              child: CustomBottomBar(color: getColor()),
+              child: CustomBottomBar(color: getColor(_currentPage.round())),
             )
           ],
         ),
       ),
     );
   }
+
+  Color getColor(int index) {
+    return listCha[index].listImage[0].color;
+  }
+
+ void _showProfessorsDialog(List<String> professors, Color characterColor) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AnimatedBuilder(
+        animation: _pageController, // Usar el mismo controlador de página para la animación
+        builder: (BuildContext context, Widget? child) {
+          return AlertDialog(
+            backgroundColor: characterColor.withOpacity(0.8), // Establecer una opacidad constante
+            title: const Text('Profesores'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: professors
+                    .map((professor) => ListTile(
+                          title: Text(
+                            professor,
+                            style: const TextStyle(color: Colors.white), // Cambiar el color del texto a blanco
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cerrar', style: TextStyle(color: Colors.white)), // Cambiar el color del texto del botón a blanco
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+
 }

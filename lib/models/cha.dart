@@ -14,12 +14,18 @@ class Cha {
     this.name,
     this.clan,
     this.nacimiento,
-    this.punctuation,
+    this.info,
+    this.combate,
+    this.evasion,
     this.listImage,
+    this.professors,
   );
   final String name;
   final String clan;
+  final String info;
   final String nacimiento;
-  final int punctuation;
+  final int combate;
+  final int evasion;
   final List<ImageCha> listImage;
+  final List<String> professors;
 }

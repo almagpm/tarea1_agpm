@@ -13,22 +13,29 @@ class DetailsChaPage extends StatefulWidget {
 }
 
 class _DetailsChaPageState extends State<DetailsChaPage> {
-   int valueIndexColor = 0;
+  int valueIndexColor = 0;
   int valueIndexSize = 1;
+  bool showInfo = false;
 
   double sizecha(int index, Size size) {
     switch (index) {
       case 0:
         return (size.height * 0.09);
       case 1:
-        return (size.height * 0.07);
+        return (size.height * 0.05);
       case 2:
-        return (size.height * 0.05);
-      case 3:
         return (size.height * 0.04);
+      case 3:
+        return (size.height * 0.02);
       default:
-        return (size.height * 0.05);
+        return (size.height * 0.01);
     }
+  }
+
+  void toggleInfo() {
+    setState(() {
+      showInfo = !showInfo;
+    });
   }
 
   @override
@@ -43,19 +50,20 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
               top: -size.height * 0.15,
               right: -size.height * 0.20,
               child: TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 250),
-                  tween: Tween(begin: 0, end: 1),
-                  builder: (context, value, __) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
-                      height: value * (size.height * 0.5),
-                      width: value * (size.height * 0.5),
-                      decoration: BoxDecoration(
-                        color: widget.cha.listImage[valueIndexColor].color,
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  }),
+                duration: const Duration(milliseconds: 250),
+                tween: Tween(begin: 0, end: 1),
+                builder: (context, value, __) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    height: value * (size.height * 0.5),
+                    width: value * (size.height * 0.5),
+                    decoration: BoxDecoration(
+                      color: widget.cha.listImage[valueIndexColor].color,
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                },
+              ),
             ),
             Positioned(
               top: kToolbarHeight,
@@ -110,7 +118,7 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
               ),
             ),
             Positioned(
-              top: size.height * 0.6,
+              top: size.height * 0.55,
               left: 16,
               right: 16,
               child: Column(
@@ -133,7 +141,7 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                widget.cha.name,
+                                widget.cha.clan,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 20,
@@ -160,21 +168,70 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 8),
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Icon(
-                              Icons.star,
-                              color: widget.cha.punctuation > index
-                                  ? widget
-                                      .cha.listImage[valueIndexColor].color
-                                  : Colors.white,
+                        ShakeTransition(
+                          child: Center(
+                            child: Text(
+                              'Habilidades',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                         ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Center(
+                                child: Text('Combate mano a mano'),
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  5,
+                                  (index) => Icon(
+                                    Icons.star,
+                                    color: widget.cha.combate > index
+                                        ? widget
+                                            .cha.listImage[valueIndexColor]
+                                            .color
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Center(
+                                child: Text('Evasión'),
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  5,
+                                  (index) => Icon(
+                                    Icons.star,
+                                    color: widget.cha.evasion > index
+                                        ? widget
+                                            .cha.listImage[valueIndexColor]
+                                            .color
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 8),
                         const Text(
-                          'SIZE',
+                          'Zoom',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -196,10 +253,10 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                                         .cha.listImage[valueIndexColor].color
                                     : Colors.white,
                                 child: Text(
-                                  '${index + 7}',
+                                  '%${(index + 1) * 25}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 22,
+                                    fontSize: 16,
                                     color: index == valueIndexSize
                                         ? Colors.white
                                         : Colors.black,
@@ -222,7 +279,7 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'COLOR',
+                              'Galeria de fotos',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -260,11 +317,11 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                       ShakeTransition(
                         left: false,
                         child: CustomButton(
-                          onTap: () {},
+                          onTap: toggleInfo,
                           width: 100,
                           color: widget.cha.listImage[valueIndexColor].color,
-                          child: const Text(
-                            'BUY',
+                          child: Text(
+                            showInfo ? 'Ver menos' : 'Ver más',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -275,6 +332,33 @@ class _DetailsChaPageState extends State<DetailsChaPage> {
                     ],
                   ),
                 ],
+              ),
+            ),
+            Positioned(
+              top: size.height * 0.40, // Ajuste de posición
+              left: 16,
+              right: 16,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: showInfo
+                    ? ShakeTransition(
+                        child: Container(
+                          key: ValueKey(true),
+                          padding: EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: widget.cha.listImage[valueIndexColor].color,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Text(
+                            widget.cha.info,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink(),
               ),
             ),
           ],
